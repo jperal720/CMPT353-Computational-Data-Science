@@ -25,8 +25,15 @@ df1 = df1.sort_values(by=['views'], ascending=False)
 plt.figure(figsize=(10,5)) #Change the size to something sensible
 plt.subplot(1, 2, 1) #Subplots in 1 row, 2 columns, select the first
 plt.plot(df1['views'].values) #build plot 1
+plt.title("Page vs Views")
+plt.xlabel("Page")
+plt.ylabel("Views")
 plt.subplot(1, 2, 2) #Subplots in 1 row, 2 columns, select the second
 plt.scatter(df3['views'], df3['views2']) #build plot 2
 plt.xscale('log') #Scaling x axis
 plt.yscale('log') #Scaling y axis
+plt.title("Page Views - Text 1 vs Text 2")
+plt.xlabel("Text 1 Page Views")
+plt.ylabel("Text 2 Page Views")
 plt.savefig('wikipedia.png')
+
