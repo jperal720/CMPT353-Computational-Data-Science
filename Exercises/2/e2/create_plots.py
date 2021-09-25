@@ -32,8 +32,8 @@ plt.subplot(1, 2, 2) #Subplots in 1 row, 2 columns, select the second
 plt.scatter(df3['views'], df3['views2']) #build plot 2
 plt.xscale('log') #Scaling x axis
 plt.yscale('log') #Scaling y axis
-plt.title("Page Views - Text 1 vs Text 2")
-plt.xlabel("Text 1 Page Views")
-plt.ylabel("Text 2 Page Views")
+plt.title("Page Views - Hour 1 vs Hour 2")
+plt.xlabel("Hour 1 Page Views")
+plt.ylabel("Hour 2 Page Views")
 plt.savefig('wikipedia.png')
 
