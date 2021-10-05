@@ -14,15 +14,18 @@ cpu_data['timestamp'] = pd.to_datetime(cpu_data['timestamp'], format='%Y%m%d %H:
 
 pd.set_option('display.width', 2000)
 
-print(cpu_data)
-print(cpu_data['timestamp'][2])
-
 loess_smoothed = lowess(cpu_data['temperature'], cpu_data['timestamp'], frac=0.015) #LOWESS function
+
+#Kalman Smoothing
+
+kalman_data = cpu_data[['temperature', 'cpu_percent', 'sys_load_1', 'fan_rpm']]
+print(kalman_data)
+
 
 
 
 plt.figure(figsize=(12, 4))
 plt.plot(cpu_data['timestamp'], cpu_data['temperature'], 'b.', alpha=0.5)
 plt.plot(cpu_data['timestamp'], loess_smoothed[:, 1], 'r-')
-plt.show() # maybe easier for testing
-# plt.savefig('cpu.svg') # for final submission
+# plt.show() # maybe easier for testing
+plt.savefig('cpu.svg') # for final submission
