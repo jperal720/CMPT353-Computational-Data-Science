@@ -21,7 +21,7 @@ observation_covariance = np.diag([0.5, 0.25]) ** 2
 
 delta_t = 2 * np.pi / n_samples
 transition_matrix = [[1, delta_t] , [-1 * delta_t, 1]]
-transition_covariance = np.diag([0.2, 0.2]) ** 2
+transition_covariance = np.diag([0, 0]) ** 2
 
 
 kf = KalmanFilter(
