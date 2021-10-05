@@ -2,6 +2,7 @@ from matplotlib import pyplot as plt
 from statsmodels.nonparametric.smoothers_lowess import lowess
 import pandas as pd
 import numpy as np
+import pykalman as pyk
 import sys
 
 dataset_location = 'sysinfo.csv'
@@ -21,6 +22,12 @@ loess_smoothed = lowess(cpu_data['temperature'], cpu_data['timestamp'], frac=0.0
 kalman_data = cpu_data[['temperature', 'cpu_percent', 'sys_load_1', 'fan_rpm']]
 print(kalman_data)
 
+initial_state = kalman_data.iloc[0]
+observation_covariance = np.diag([0, 0, 0, 0]) ** 2 # TODO: shouldn't be zero
+transition_covariance = np.diag([0, 0, 0, 0]) ** 2 # TODO: shouldn't be zero
+transition = [[0,0,0,0], [0,0,0,0], [0,0,0,0], [0,0,0,0]] # TODO: shouldn't (all) be zero
+
+print(initial_state)
 
 
 
