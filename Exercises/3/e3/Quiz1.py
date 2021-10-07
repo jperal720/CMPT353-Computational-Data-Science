@@ -57,13 +57,10 @@ all_data = pd.DataFrame({})
 # ])
 
 all_data = all_data.append(populations)
-all_data = all_data.append(covid)
-
-
-all_data = all_data.set_index('province')
-
-grouped = pd.DataFrame()
+# all_data = all_data.append(covid)
+all_data['cases'] = covid['cases'].values
+all_data['active'] = covid['active'].values
 
 
 print(all_data)
-print(all_data)
+# print(all_data)
