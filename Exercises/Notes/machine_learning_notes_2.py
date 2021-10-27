@@ -33,3 +33,4 @@ model = LinearRegression(fit_intercept=False)
 model.fit(X_poly, y)
 
 print(model.coef_)
+#
