@@ -14,12 +14,14 @@ def get_data(filename):
     Read the given CSV file. Returns sysinfo DataFrame with target (next temperature) column created.
     """
     sysinfo = pd.read_csv(filename, parse_dates=['timestamp'])
+
     # TODO: add the column that we want to predict: the temperatures from the *next* time step.
-    sysinfo['next_temp'] = sysinfo['temperature']
-    sysinfo['next_temp'] = sysinfo['next_temp'].shift(periods=-1)
+
     sysinfo[y_column] = sysinfo['temperature']  # should be the temperature value from the next row
     sysinfo = sysinfo[sysinfo[y_column].notnull()]  # the last row should have y_column null: no next temp known
-    sysinfo
+    sysinfo['next_temp'] = sysinfo['temperature']
+    sysinfo['next_temp'] = sysinfo['next_temp'].shift(periods=-1)
+    sysinfo.drop(sysinfo[sysinfo['next_temp'].isna()].index, inplace=True)
     return sysinfo
 
 
@@ -31,6 +33,11 @@ def get_trained_coefficients(X_train, y_train):
     """
 
     # TODO: create regression model and train.
+    # X_train = np.concatenate([X_train], axis=1)
+    # y_train = np.stack([y_train], axis=1)
+
+    # print(X_train)
+
     model = LinearRegression(fit_intercept=False)
     model.fit(X_train, y_train)
     coefficients = model.coef_
@@ -69,7 +76,7 @@ def smooth_test(coef, sysinfo, outfile):
 
     # TODO: replace the first row of transition to use the coefficients we just calculated (which were passed into this function as coef.).
     transition = transition * coef
-    print(transition)
+    # print(transition)
 
     kf = KalmanFilter(
         initial_state_mean=initial,
@@ -99,7 +106,7 @@ def main(training_file, validation_file):
     output_regression(coefficients)
     smooth_test(coefficients, train, 'train.png')
 
-    # print("Training score: %g\nValidation score: %g" % (model.score(X_train, y_train), model.score(X_valid, y_valid)))
+    print("Training score: %g\nValidation score: %g" % (model.score(X_train, y_train), model.score(X_valid, y_valid)))
 
     plot_errors(model, X_valid, y_valid)
     smooth_test(coefficients, valid, 'valid.png')
