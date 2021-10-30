@@ -113,5 +113,4 @@ def main(training_file, validation_file):
 
 
 if __name__ == '__main__':
-    main('sysinfo-train.csv', 'sysinfo-valid.csv')
-    # main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], sys.argv[2])

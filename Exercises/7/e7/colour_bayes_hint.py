@@ -2,8 +2,13 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from skimage.color import lab2rgb
+from skimage.color import rgb2lab
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.pipeline import make_pipeline
+from sklearn.metrics import classification_report
+from sklearn.preprocessing import FunctionTransformer
 import sys
-
 
 # representative RGB colours for each label, for nice display
 COLOUR_RGB = {
@@ -62,18 +67,41 @@ def plot_predictions(model, lum=70, resolution=256):
     plt.yticks(np.linspace(0, hei, n_ticks), np.linspace(-100, 100, n_ticks))
     plt.xlabel('A')
     plt.imshow(pixels)
+    plt.show()
 
 
 def main(infile):
     data = pd.read_csv(infile)
-    X = data # array with shape (n, 3). Divide by 255 so components are all 0-1.
-    y = data # array with shape (n,) of colour words.
+    X = pd.DataFrame() # array with shape (n, 3). Divide by 255 so components are all 0-1.
+    y = pd.DataFrame() # array with shape (n,) of colour words.
+
+    X['R'] = data['R']
+    X['G'] = data['G']
+    X['B'] = data['B']
+
+    X = X/255
+
+    y['Label'] = data['Label']
+
+    X_train, X_valid, y_train, y_valid = train_test_split(X, y)
 
     # TODO: build model_rgb to predict y from X.
+    model_rgb = GaussianNB()
+    model_rgb.fit(X_train, y_train)
+
     # TODO: print model_rgb's accuracy score
+    print('scores (RGB):', '\ntrain ->', model_rgb.score(X_train, y_train), '\nvalid ->', model_rgb.score(X_valid, y_valid))
 
     # TODO: build model_lab to predict y from X by converting to LAB colour first.
+    model_lab = make_pipeline(
+        FunctionTransformer(rgb2lab, validate=True),
+        GaussianNB()
+    )
+
+    model_lab.fit(X_train, y_train)
+
     # TODO: print model_lab's accuracy score
+    print('scores (Lab):', '\ntrain ->', model_lab.score(X_train, y_train), '\nvalid ->', model_lab.score(X_valid, y_valid))
 
     plot_predictions(model_rgb)
     plt.savefig('predictions_rgb.png')

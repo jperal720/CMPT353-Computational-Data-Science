@@ -31,3 +31,20 @@ model.fit(X_train, y_train)
 print(model.score(X_valid, y_valid)
 
 """
+
+"""
+Adding a transform to a pipeline and training it.
+
+def de_skew(X):
+    X0 = X[:, 0] - X[:, 1]
+    X1 = X[:, 1]
+    
+    return np.stack([X0, X1], axis=1)
+    
+model = make_pipeline(
+    FunctionTransformer(de_skew, validate=True),
+    GaussianNB()
+)
+
+model.fit(X_train, y_train)
+"""
