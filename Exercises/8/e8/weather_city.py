@@ -5,6 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import StandardScaler
 import sys
 
 data_labelled = pd.read_csv(sys.argv[1])
@@ -22,13 +23,16 @@ X_unlabelled = X_unlabelled.drop('city', axis=1)
 
 X_train, X_valid, y_train, y_valid = train_test_split(X, y)
 
-model = RandomForestClassifier()
+model = make_pipeline(
+    StandardScaler(),
+    RandomForestClassifier()
+    )
 model.fit(X_train, y_train.values.ravel())
 
-print(model.score(X_valid, y_valid))
+print('score:', model.score(X_valid, y_valid))
 
 
 y_prediction = model.predict(X_unlabelled)
 labels = pd.DataFrame(y_prediction)
 
-labels.to_csv(sys.argv[3])
+labels.to_csv(sys.argv[3], index=False, header=False)
