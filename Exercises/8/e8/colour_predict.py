@@ -36,13 +36,12 @@ COLOUR_RGB = {
 name_to_rgb = np.vectorize(COLOUR_RGB.get, otypes=[np.uint8, np.uint8, np.uint8])
 
 def main():
-    data = pd.read_csv('colour-data.csv')
+    data = pd.read_csv(sys.argv[1])
     X = data[['R', 'G', 'B']].values / 255
     y = data['Label'].values
 
     X_train, X_valid, y_train, y_valid = train_test_split(X, y)
 
-    # TODO: create some models
     bayes_rgb_model = GaussianNB()
     bayes_convert_model = make_pipeline(
         FunctionTransformer(rgb2lab, validate=True),
@@ -66,7 +65,6 @@ def main():
     models = [bayes_rgb_model, bayes_convert_model, knn_rgb_model, knn_convert_model, rf_rgb_model, rf_convert_model]
     for i, m in enumerate(models):  # yes, you can leave this loop in if you want.
         m.fit(X_train, y_train)
-        # plt.savefig('predictions-%i.png' % (i,))
 
     print(OUTPUT_TEMPLATE.format(
         bayes_rgb=bayes_rgb_model.score(X_valid, y_valid),
