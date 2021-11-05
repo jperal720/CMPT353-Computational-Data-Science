@@ -6,6 +6,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import FunctionTransformer
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
 import sys
 
 data_labelled = pd.read_csv(sys.argv[1])
@@ -25,7 +26,7 @@ X_train, X_valid, y_train, y_valid = train_test_split(X, y)
 
 model = make_pipeline(
     StandardScaler(),
-    RandomForestClassifier()
+    SVC()
     )
 model.fit(X_train, y_train.values.ravel())
 
