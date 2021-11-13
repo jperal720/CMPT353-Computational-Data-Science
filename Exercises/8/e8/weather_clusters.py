@@ -9,7 +9,7 @@ from sklearn.cluster import KMeans
 
 
 def get_pca(X):
-    """ 
+    """
     Transform data to 2D points for plotting. Should return an array with shape (n, 2).
     """
     flatten_model = make_pipeline(
