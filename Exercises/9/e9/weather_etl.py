@@ -33,9 +33,9 @@ def main(in_directory, out_directory):
         weather['date'],
         (weather['value'] / 10).alias('tmax')
     )
-    cleaned_data.show()
+    # cleaned_data.show()
 
-    # cleaned_data.write.json(out_directory, compression='gzip', mode='overwrite')
+    cleaned_data.write.json(out_directory, compression='gzip', mode='overwrite')
 
 
 if __name__=='__main__':
