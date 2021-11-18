@@ -37,11 +37,22 @@ comments_schema = types.StructType([
 
 def main(in_directory, out_directory):
     comments = spark.read.json(in_directory, schema=comments_schema)
+    # comments = spark.read.json(in_directory)
 
     # TODO: calculate averages, sort by subreddit. Sort by average score and output that too.
+    # comments.show(); return
+    grouped = comments.groupBy(comments['subreddit'])
+    grouped = grouped.cache()
+    groups = grouped.agg(
+        functions.avg(comments['score'])
+    )
+    groups = groups.sort(groups['avg(score)'].desc())   #Sorting in descending order
 
-    #averages_by_subreddit.write.csv(out_directory + '-subreddit', mode='overwrite')
-    #averages_by_score.write.csv(out_directory + '-score', mode='overwrite')
+
+    groups.show(); return
+
+    averages_by_subreddit.write.csv(out_directory + '-subreddit', mode='overwrite')
+    averages_by_score.write.csv(out_directory + '-score', mode='overwrite')
 
 
 if __name__=='__main__':
