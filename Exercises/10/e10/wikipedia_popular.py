@@ -1,5 +1,7 @@
 import sys
+import re
 import pandas as pd
+from datetime import datetime
 from pyspark.sql import SparkSession, functions, types
 
 spark = SparkSession.builder.appName('reddit averages').getOrCreate()
@@ -15,10 +17,6 @@ comments_schema = types.StructType([
     types.StructField('bytes', types.LongType()),
 ])
 
-
-
-
-
 def main(in_directory, out_directory):
     pagesDF = spark.read.csv(in_directory, schema=comments_schema, sep=' ').withColumn('filename', functions.input_file_name())
 
@@ -27,12 +25,14 @@ def main(in_directory, out_directory):
     pagesDF = pagesDF.cache()
     groups = pagesDF.sort(pagesDF['request'].desc())   #Sorting in descending order
     groups = groups.filter(groups.language.eqNullSafe('en'))
-    groups.show(200, False); return
-
-    pagesDF.show(200, False); return
+    groups.show(20, False); return
 
 def path_to_hour(input):
     input = input[-18: -7]
+    # input = input.replace('-', ' ')
+    # input = input + ':'
+    # input = input[0:4] + "/" + input[4:6] + "/" + input[6:]
+    # input = datetime.strptime(input, '%y/%m/%d %H:')
 
     return input
 
