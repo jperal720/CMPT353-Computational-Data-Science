@@ -37,7 +37,6 @@ def main(in_directory, out_directory):
         # TODO: output the average y value. Hint: avg
         functions.avg(with_bins['y']),
         functions.count('*'))
-
     # We know groups has <=10 rows, so it can safely be moved into two partitions.
     groups = groups.sort(groups['bin']).coalesce(2)
     groups.write.csv(out_directory, compression=None, mode='overwrite')

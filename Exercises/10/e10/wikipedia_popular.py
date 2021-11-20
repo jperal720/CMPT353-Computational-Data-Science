@@ -1,4 +1,5 @@
 import sys
+import pandas as pd
 from pyspark.sql import SparkSession, functions, types
 
 spark = SparkSession.builder.appName('reddit averages').getOrCreate()
@@ -7,20 +8,35 @@ spark.sparkContext.setLogLevel('WARN')
 assert sys.version_info >= (3, 5) # make sure we have Python 3.5+
 assert spark.version >= '2.3' # make sure we have Spark 2.3+
 
-def transform_filename(input):
+comments_schema = types.StructType([
+    types.StructField('language', types.StringType()),
+    types.StructField('Name', types.StringType()),
+    types.StructField('request', types.IntegerType()),
+    types.StructField('bytes', types.LongType()),
+])
 
-    print(type(input))
-    return input
+
+
 
 
 def main(in_directory, out_directory):
-    pages = spark.read.csv(in_directory, inferSchema=True).withColumn('filename', functions.input_file_name())
+    pagesDF = spark.read.csv(in_directory, schema=comments_schema, sep=' ').withColumn('filename', functions.input_file_name())
 
-    pages = pages.select(
-        pages['_c0'].alias('Name'),
-        pages['filename'].alias('Filename')
-    )
-    pages.withColumn("Filename", transform_filename("Filename"))
+    pagesDF = pagesDF.withColumn("NewFilename", udf(pagesDF['filename']))
+    pagesDF = pagesDF.drop(pagesDF["filename"])
+    pagesDF = pagesDF.cache()
+    groups = pagesDF.sort(pagesDF['request'].desc())   #Sorting in descending order
+    groups = groups.filter(groups.language.eqNullSafe('en'))
+    groups.show(200, False); return
+
+    pagesDF.show(200, False); return
+
+def path_to_hour(input):
+    input = input[-18: -7]
+
+    return input
+
+udf = functions.udf(path_to_hour, returnType=types.StringType())
 
 if __name__=='__main__':
     in_directory = sys.argv[1]
