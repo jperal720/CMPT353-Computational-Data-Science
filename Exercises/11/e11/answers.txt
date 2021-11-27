@@ -1,0 +1,4 @@
+W/ broadcast(): 20.966s
+W/o broadcast(): 47.848s
+W/o broadcast() and command added: 37.914s
+Conclusion: Running time was halved when using broadcast(). When not using broadcast and adding the extra command, the difference in time with "w/o broadcast()" was 10 seconds.}

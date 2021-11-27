@@ -39,20 +39,30 @@ def main(in_directory, out_directory):
     comments = spark.read.json(in_directory, schema=comments_schema)
 
     # TODO
-    grouped = comments.groupBy(comments['subreddit'])
-    groups = grouped.agg(
+    df = comments.select(
+        comments['subreddit'],
+        comments['author'],
+        comments['score']
+    )
+    group_sub = df.groupBy(comments['subreddit'])
+
+
+    best_score = group_sub.agg(
         functions.max(comments['score']),
-        functions.avg(comments['score'])
+        functions.avg(comments['score']),
+        functions.broadcast(group_sub)
     )
 
-    groups = groups.select(
-        groups['subreddit'],
-        (groups['max(score)'] / groups['avg(score)']).alias('rel_score')
+    best_score = best_score.select(
+        best_score['subreddit'],
+        (best_score['max(score)'] / best_score['avg(score)']).alias('rel_score')
     )
-    pprint(groups.rdd.take(5))
-    groups.show(); return
 
-    #best_author.write.json(out_directory, mode='overwrite')
+    best_score = best_score.cache()
+
+    best_score.show()
+
+    best_score.write.json(out_directory, mode='overwrite')
 
 
 if __name__=='__main__':
