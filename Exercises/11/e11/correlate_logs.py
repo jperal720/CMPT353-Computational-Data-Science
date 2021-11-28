@@ -1,6 +1,7 @@
 import sys
 from pyspark.sql import SparkSession, functions, types, Row
 import re
+from pprint import pprint
 
 spark = SparkSession.builder.appName('correlate logs').getOrCreate()
 spark.sparkContext.setLogLevel('WARN')
@@ -17,7 +18,12 @@ def line_to_row(line):
     """
     m = line_re.match(line)
     if m:
-        # TODO
+        arr_split = []
+        arr_split = line.split()
+        hostname = arr_split[0]
+        bytes = arr_split[len(arr_split) - 1] #returning last element
+
+        return Row(hostname=str(hostname), bytes=int(bytes))
     else:
         return None
 
@@ -31,13 +37,44 @@ def not_none(row):
 
 def create_row_rdd(in_directory):
     log_lines = spark.sparkContext.textFile(in_directory)
-    # TODO: return an RDD of Row() objects
+    rows = log_lines.map(line_to_row).filter(not_none)
+
+    return rows
 
 
 def main(in_directory):
     logs = spark.createDataFrame(create_row_rdd(in_directory))
+    # logs.show()
 
+    hostname_group = logs.groupBy(logs['hostname'])
+
+    hostname_group = hostname_group.agg(
+        functions.count(logs['hostname']).alias("sum(x)"),
+        functions.pow(functions.count(logs['hostname']), 2).alias("squared(sum(x))"),
+        functions.sum(logs['bytes']).alias("sum(y)"),
+        functions.pow(functions.sum(logs['bytes']), 2).alias("squared(sum(y))")
+    )
+
+    values = hostname_group.select(
+        hostname_group["sum(x)"],
+        hostname_group["squared(sum(x))"],
+        hostname_group["sum(y)"],
+        hostname_group["squared(sum(y))"],
+        hostname_group["sum(x)"] * hostname_group["sum(y)"]
+    )
+
+    values = values.withColumn("1", functions.lit(1))
+    values.show()
     # TODO: calculate r.
+    six_sums = values.groupBy()
+    six_sums = six_sums.agg(
+        functions.first()
+    )
+    df = six_sums.select(
+        six_sums['sum(x)']
+    )
+
+    sf.show()
 
     r = 0 # TODO: it isn't zero.
     print("r = %g\nr^2 = %g" % (r, r**2))
