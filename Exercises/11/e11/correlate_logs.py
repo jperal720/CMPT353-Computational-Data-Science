@@ -66,7 +66,7 @@ def main(in_directory):
 
     values = values.withColumn("1", functions.lit(1))
     values.show()
-    # TODO: calculate r.
+
     six_sums = values.groupBy()
     six_sums = six_sums.agg(
         functions.sum("sum(x)").alias("sum(x)"),
@@ -88,8 +88,7 @@ def main(in_directory):
     row = df.first()
     n, x, x2, y, y2, xy = row
 
-    print(n, x, x2, y, y2, xy)
-
+    #Calculation of r
     r = ( (n * xy) - (x * y) ) \
         / ( math.sqrt( (n * x2) - math.pow(x, 2) ) * math.sqrt( (n * y2) - math.pow(y, 2)) )
     print("r = %g\nr^2 = %g" % (r, r**2))
