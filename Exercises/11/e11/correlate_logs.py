@@ -2,6 +2,7 @@ import sys
 from pyspark.sql import SparkSession, functions, types, Row
 import re
 from pprint import pprint
+import math
 
 spark = SparkSession.builder.appName('correlate logs').getOrCreate()
 spark.sparkContext.setLogLevel('WARN')
@@ -68,15 +69,29 @@ def main(in_directory):
     # TODO: calculate r.
     six_sums = values.groupBy()
     six_sums = six_sums.agg(
-        functions.first()
+        functions.sum("sum(x)").alias("sum(x)"),
+        functions.sum("squared(sum(x))").alias("sum(x^2)"),
+        functions.sum("sum(y)").alias("sum(y)"),
+        functions.sum("squared(sum(y))").alias("sum(y^2)"),
+        functions.sum("(sum(x) * sum(y))").alias("product(xy)"),
+        functions.sum("1").alias("sum(1)")
     )
     df = six_sums.select(
-        six_sums['sum(x)']
+        six_sums['sum(1)'],
+        six_sums['sum(x)'],
+        six_sums['sum(x^2)'],
+        six_sums['sum(y)'],
+        six_sums['sum(y^2)'],
+        six_sums['product(xy)']
     )
 
-    sf.show()
+    row = df.first()
+    n, x, x2, y, y2, xy = row
 
-    r = 0 # TODO: it isn't zero.
+    print(n, x, x2, y, y2, xy)
+
+    r = ( (n * xy) - (x * y) ) \
+        / ( math.sqrt( (n * x2) - math.pow(x, 2) ) * math.sqrt( (n * y2) - math.pow(y, 2)) )
     print("r = %g\nr^2 = %g" % (r, r**2))
 
 
