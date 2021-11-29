@@ -47,10 +47,10 @@ def main(in_directory, out_directory):
     groups = groups.sort(groups['avg(score)'].desc())   #Sorting in descending order
 
 
-    groups.show(); return
+    groups.show()
 
-    averages_by_subreddit.write.csv(out_directory + '-subreddit', mode='overwrite')
-    averages_by_score.write.csv(out_directory + '-score', mode='overwrite')
+    # averages_by_subreddit.write.csv(out_directory + '-subreddit', mode='overwrite')
+    groups.write.csv(out_directory + '-score', mode='overwrite')
 
 
 if __name__=='__main__':

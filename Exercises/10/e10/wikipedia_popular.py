@@ -25,7 +25,8 @@ def main(in_directory, out_directory):
     pagesDF = pagesDF.cache()
     groups = pagesDF.sort(pagesDF['request'].desc())   #Sorting in descending order
     groups = groups.filter(groups.language.eqNullSafe('en'))
-    groups.show(20, False); return
+
+    groups
 
 def path_to_hour(input):
     input = input[-18: -7]
