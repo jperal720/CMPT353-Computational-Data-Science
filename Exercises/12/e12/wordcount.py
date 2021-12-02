@@ -13,19 +13,20 @@ assert spark.version >= '2.3' # make sure we have Spark 2.3+
 def main(in_directory, out_directory):
     wordbreak = r'[%s\s]+' % (re.escape(string.punctuation),)
     text = spark.read.text(in_directory)
-    text = text.select(
-        functions.lower(text['value']).alias('value'),
-        functions.split(text['value'], wordbreak).alias("split"),
-    )
+    text = text.select(functions.lower(text['value']).alias('value'))
+    text = text.select(functions.split(text['value'], wordbreak).alias("split"))
+
     text = text.select(
         functions.explode(text['split']).alias("words")
     )
+
     group = text.groupBy(text['words'])
     group = group.agg(
         functions.ltrim(text['words']),
         functions.rtrim(text['words']),
         functions.count(text['words']).alias("count(words)"),
     )
+
     text = group.select(
         group['words'],
         group['count(words)']
